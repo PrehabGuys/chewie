@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chewie/custom_buttons.dart';
 import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
@@ -18,9 +19,13 @@ class MaterialControls extends StatefulWidget {
   const MaterialControls({
     this.showPlayButton = true,
     Key? key,
+    this.additionalButtons,
+    this.playbackSpeedButton,
   }) : super(key: key);
 
   final bool showPlayButton;
+  final List<AdditionalButton>? additionalButtons;
+  final AdditionalButton? playbackSpeedButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -91,6 +96,9 @@ class _MaterialControlsState extends State<MaterialControls>
               else
                 _buildHitArea(),
               _buildActionBar(),
+              if (widget.additionalButtons != null &&
+                  widget.additionalButtons!.isNotEmpty)
+                _buildAdditionalButtons(),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -153,6 +161,32 @@ class _MaterialControlsState extends State<MaterialControls>
               _buildSubtitleToggle(),
               if (chewieController.showOptions) _buildOptionsButton(),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAdditionalButtons() {
+    return Positioned(
+      top: 0,
+      left: 0,
+      child: SafeArea(
+        child: AnimatedOpacity(
+          opacity: notifier.hideStuff ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 250),
+          child: Row(
+            children: widget.additionalButtons!
+                .map((element) => Padding(
+                      padding:
+                          element.margin ?? const EdgeInsets.only(right: 5),
+                      child: GestureDetector(
+                          child: Padding(
+                        padding: element.padding ?? EdgeInsets.zero,
+                        child: element.icon,
+                      )),
+                    ))
+                .toList(),
           ),
         ),
       ),

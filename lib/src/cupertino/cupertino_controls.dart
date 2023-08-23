@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:chewie/custom_buttons.dart';
 import 'package:chewie/src/animated_play_pause.dart';
 import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
@@ -23,11 +24,15 @@ class CupertinoControls extends StatefulWidget {
     required this.iconColor,
     this.showPlayButton = true,
     Key? key,
+    this.additionalButtons = const [],
+    this.playbackSpeedButton,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
   final bool showPlayButton;
+  final CustomPlaybackSpeedButton? playbackSpeedButton;
+  final List<AdditionalButton>? additionalButtons;
 
   @override
   State<StatefulWidget> createState() {
@@ -612,7 +617,49 @@ class _CupertinoControlsState extends State<CupertinoControls>
               barHeight,
               buttonPadding,
             ),
+          if (widget.additionalButtons != null)
+            ...widget.additionalButtons!.map((element) => CustomControlButton(
+                  notifier: notifier,
+                  backgroundColor: backgroundColor,
+                  height: barHeight,
+                  padding: element.padding ??
+                      EdgeInsets.symmetric(horizontal: buttonPadding),
+                  margin: element.margin,
+                  icon: element.icon,
+                  onTap: element.onTap,
+                )),
           const Spacer(),
+          if (widget.playbackSpeedButton != null)
+            CustomControlButton(
+              notifier: notifier,
+              backgroundColor: backgroundColor,
+              height: barHeight,
+              padding: widget.playbackSpeedButton!.padding ??
+                  EdgeInsets.symmetric(horizontal: buttonPadding),
+              margin: widget.playbackSpeedButton!.margin,
+              icon: Text('${_latestValue.playbackSpeed}x',
+                  style: const TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  )),
+              onTap: () async {
+                _hideTimer?.cancel();
+                final speeds = widget.playbackSpeedButton!.playbackSpeeds;
+
+                int index = speeds.indexOf(_latestValue.playbackSpeed);
+                index++;
+                if (index == speeds.length) index = 0;
+
+                await controller.setPlaybackSpeed(speeds[index]);
+
+                if (widget.playbackSpeedButton?.onTap != null) {
+                  widget.playbackSpeedButton!.onTap!(speeds[index]);
+                }
+
+                if (_latestValue.isPlaying) _startHideTimer();
+              },
+            ),
           if (chewieController.allowMuting)
             _buildMuteButton(
               controller,
@@ -842,6 +889,53 @@ class _PlaybackSpeedDialog extends StatelessWidget {
             ),
           )
           .toList(),
+    );
+  }
+}
+
+class CustomControlButton extends StatelessWidget {
+  const CustomControlButton(
+      {Key? key,
+      this.onTap,
+      required this.notifier,
+      required this.height,
+      this.margin,
+      required this.padding,
+      required this.backgroundColor,
+      required this.icon})
+      : super(key: key);
+
+  final Function()? onTap;
+  final PlayerNotifier notifier;
+  final double height;
+  final EdgeInsets? margin;
+  final EdgeInsets padding;
+  final Color backgroundColor;
+  final Widget icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: margin ?? const EdgeInsets.only(left: 5),
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedOpacity(
+          opacity: notifier.hideStuff ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 10.0),
+              child: Container(
+                height: height,
+                color: backgroundColor,
+                padding: padding,
+                child: Center(child: icon),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

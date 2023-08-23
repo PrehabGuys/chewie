@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:chewie/chewie.dart';
+import 'package:chewie/custom_buttons.dart';
+// ignore: depend_on_referenced_packages
 import 'package:chewie_example/app/theme.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -26,6 +28,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   late VideoPlayerController _videoPlayerController2;
   ChewieController? _chewieController;
   int? bufferDelay;
+  double speed = 1.25;
 
   @override
   void initState() {
@@ -113,6 +116,17 @@ class _ChewieDemoState extends State<ChewieDemo> {
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
+
+      playbackSpeedButton: CustomPlaybackSpeedButton(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+        margin: const EdgeInsets.only(right: 5),
+        playbackSpeeds: [0.5, 0.75, 1, 1.25, 1.5],
+        onTap: (value) {
+          setState(() {
+            speed = value;
+          });
+        },
+      ),
       looping: true,
       progressIndicatorDelay:
           bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
@@ -155,6 +169,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
       // ),
       // autoInitialize: true,
     );
+
+    _chewieController!.videoPlayerController.setPlaybackSpeed(speed);
   }
 
   int currPlayIndex = 0;
@@ -189,9 +205,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     ? Chewie(
                         controller: _chewieController!,
                       )
-                    : const Column(
+                    : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           CircularProgressIndicator(),
                           SizedBox(height: 20),
                           Text('Loading'),
@@ -203,7 +219,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
               onPressed: () {
                 _chewieController?.enterFullScreen();
               },
-              child: const Text('Fullscreen'),
+              child: Text('Fullscreen $speed x'),
             ),
             Row(
               children: <Widget>[

@@ -1,9 +1,7 @@
 import 'dart:async';
 
-import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/models/option_item.dart';
-import 'package:chewie/src/models/options_translation.dart';
-import 'package:chewie/src/models/subtitle_model.dart';
+import 'package:chewie/chewie.dart';
+import 'package:chewie/custom_buttons.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
@@ -27,10 +25,13 @@ class Chewie extends StatefulWidget {
   const Chewie({
     Key? key,
     required this.controller,
+    this.hideVideo = false,
   }) : super(key: key);
 
   /// The [ChewieController]
   final ChewieController controller;
+
+  final bool hideVideo;
 
   @override
   ChewieState createState() {
@@ -87,7 +88,8 @@ class ChewieState extends State<Chewie> {
       controller: widget.controller,
       child: ChangeNotifierProvider<PlayerNotifier>.value(
         value: notifier,
-        builder: (context, w) => const PlayerWithControls(),
+        builder: (context, w) =>
+            PlayerWithControls(hideVideo: widget.hideVideo),
       ),
     );
   }
@@ -130,7 +132,8 @@ class ChewieState extends State<Chewie> {
       controller: widget.controller,
       child: ChangeNotifierProvider<PlayerNotifier>.value(
         value: notifier,
-        builder: (context, w) => const PlayerWithControls(),
+        builder: (context, w) =>
+            PlayerWithControls(hideVideo: widget.hideVideo),
       ),
     );
 
@@ -246,6 +249,7 @@ class ChewieState extends State<Chewie> {
 class ChewieController extends ChangeNotifier {
   ChewieController({
     required this.videoPlayerController,
+    this.playbackSpeedButton,
     this.optionsTranslation,
     this.aspectRatio,
     this.autoInitialize = false,
@@ -285,6 +289,7 @@ class ChewieController extends ChangeNotifier {
     this.progressIndicatorDelay,
     this.hideControlsTimer = defaultHideControlsTimer,
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
+    this.additionalButtons,
   }) : assert(
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
@@ -337,7 +342,8 @@ class ChewieController extends ChangeNotifier {
       Animation<double>,
       Animation<double>,
       ChewieControllerProvider,
-    )? routePageBuilder,
+    )?
+        routePageBuilder,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -387,6 +393,7 @@ class ChewieController extends ChangeNotifier {
       hideControlsTimer: hideControlsTimer ?? this.hideControlsTimer,
       progressIndicatorDelay:
           progressIndicatorDelay ?? this.progressIndicatorDelay,
+      playbackSpeedButton: playbackSpeedButton ?? playbackSpeedButton,
     );
   }
 
@@ -535,6 +542,9 @@ class ChewieController extends ChangeNotifier {
   /// Adds additional padding to the controls' [SafeArea] as desired.
   /// Defaults to [EdgeInsets.zero].
   final EdgeInsets controlsSafeAreaMinimum;
+
+  final List<AdditionalButton>? additionalButtons;
+  final CustomPlaybackSpeedButton? playbackSpeedButton;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider =

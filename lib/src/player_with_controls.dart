@@ -6,7 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 class PlayerWithControls extends StatelessWidget {
-  const PlayerWithControls({Key? key}) : super(key: key);
+  const PlayerWithControls({Key? key, required this.hideVideo})
+      : super(key: key);
+  final bool hideVideo;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,11 @@ class PlayerWithControls extends StatelessWidget {
       ChewieController chewieController,
     ) {
       return chewieController.showControls
-          ? chewieController.customControls ?? const AdaptiveControls()
+          ? chewieController.customControls ??
+              AdaptiveControls(
+                additionalButtons: chewieController.additionalButtons,
+                playbackSpeedButton: chewieController.playbackSpeedButton,
+              )
           : const SizedBox();
     }
 
