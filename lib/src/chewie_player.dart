@@ -26,12 +26,15 @@ class Chewie extends StatefulWidget {
     Key? key,
     required this.controller,
     this.hideVideo = false,
+    this.showProgressBar = true,
   }) : super(key: key);
 
   /// The [ChewieController]
   final ChewieController controller;
 
   final bool hideVideo;
+
+  final bool showProgressBar;
 
   @override
   ChewieState createState() {
@@ -88,8 +91,10 @@ class ChewieState extends State<Chewie> {
       controller: widget.controller,
       child: ChangeNotifierProvider<PlayerNotifier>.value(
         value: notifier,
-        builder: (context, w) =>
-            PlayerWithControls(hideVideo: widget.hideVideo),
+        builder: (context, w) => PlayerWithControls(
+          hideVideo: widget.hideVideo,
+          showProgressBar: widget.showProgressBar,
+        ),
       ),
     );
   }
@@ -132,8 +137,10 @@ class ChewieState extends State<Chewie> {
       controller: widget.controller,
       child: ChangeNotifierProvider<PlayerNotifier>.value(
         value: notifier,
-        builder: (context, w) =>
-            PlayerWithControls(hideVideo: widget.hideVideo),
+        builder: (context, w) => PlayerWithControls(
+          hideVideo: widget.hideVideo,
+          showProgressBar: widget.showProgressBar,
+        ),
       ),
     );
 

@@ -7,16 +7,21 @@ class AdaptiveControls extends StatelessWidget {
     Key? key,
     this.additionalButtons,
     this.playbackSpeedButton,
+    required this.showProgressBar,
   }) : super(key: key);
   final CustomPlaybackSpeedButton? playbackSpeedButton;
   final List<AdditionalButton>? additionalButtons;
+  final bool showProgressBar;
 
   @override
   Widget build(BuildContext context) {
     switch (Theme.of(context).platform) {
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
-        return MaterialControls(additionalButtons: additionalButtons);
+        return MaterialControls(
+          additionalButtons: additionalButtons,
+          showProgressBar: showProgressBar,
+        );
 
       case TargetPlatform.macOS:
       case TargetPlatform.windows:
@@ -29,9 +34,13 @@ class AdaptiveControls extends StatelessWidget {
           iconColor: const Color.fromARGB(255, 200, 200, 200),
           additionalButtons: additionalButtons,
           playbackSpeedButton: playbackSpeedButton,
+          showProgressBar: showProgressBar,
         );
       default:
-        return MaterialControls(additionalButtons: additionalButtons);
+        return MaterialControls(
+          additionalButtons: additionalButtons,
+          showProgressBar: showProgressBar,
+        );
     }
   }
 }

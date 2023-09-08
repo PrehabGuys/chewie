@@ -18,12 +18,14 @@ import 'package:video_player/video_player.dart';
 class MaterialControls extends StatefulWidget {
   const MaterialControls({
     this.showPlayButton = true,
+    required this.showProgressBar,
     Key? key,
     this.additionalButtons,
     this.playbackSpeedButton,
   }) : super(key: key);
 
   final bool showPlayButton;
+  final bool showProgressBar;
   final List<AdditionalButton>? additionalButtons;
   final AdditionalButton? playbackSpeedButton;
 
@@ -280,9 +282,12 @@ class _MaterialControlsState extends State<MaterialControls>
     );
   }
 
-  AnimatedOpacity _buildBottomBar(
+  Widget _buildBottomBar(
     BuildContext context,
   ) {
+    if (!widget.showProgressBar) {
+      return const SizedBox.shrink();
+    }
     final iconColor = Theme.of(context).textTheme.labelLarge!.color;
 
     return AnimatedOpacity(

@@ -26,11 +26,13 @@ class CupertinoControls extends StatefulWidget {
     Key? key,
     this.additionalButtons = const [],
     this.playbackSpeedButton,
+    required this.showProgressBar,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
   final bool showPlayButton;
+  final bool showProgressBar;
   final CustomPlaybackSpeedButton? playbackSpeedButton;
   final List<AdditionalButton>? additionalButtons;
 
@@ -249,6 +251,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
     Color iconColor,
     double barHeight,
   ) {
+    if (!widget.showProgressBar) {
+      return const SizedBox.shrink();
+    }
+
     return SafeArea(
       bottom: chewieController.isFullScreen,
       minimum: chewieController.controlsSafeAreaMinimum,
